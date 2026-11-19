@@ -23,6 +23,7 @@
   --r:24px;
   --safe-t:env(safe-area-inset-top,0px); --safe-b:env(safe-area-inset-bottom,0px);
   --safe-l:env(safe-area-inset-left,0px); --safe-r:env(safe-area-inset-right,0px);
+  --tabbar:calc(62px + max(var(--safe-b),10px)); /* iPhone 16: 62 + 34 = 96px, ekranın en altına kadar */
   /* yay eğrileri */
   --spring:cubic-bezier(.34,1.56,.64,1);
   --spring-soft:cubic-bezier(.22,1.2,.36,1);
@@ -36,16 +37,18 @@
   }
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);font-family:var(--font);font-size:16px;line-height:1.4;
-  -webkit-font-smoothing:antialiased;overscroll-behavior:none}
-body{-webkit-user-select:none;user-select:none;overflow:hidden}
+/* Sayfa belgenin kendisiyle kayar: iPhone ana ekran uygulamasında %100 yükseklik kısa kalıp altta boşluk bırakıyordu */
+html{background:var(--bg);overscroll-behavior-y:none;-webkit-text-size-adjust:100%}
+body{margin:0;min-height:100vh;min-height:100lvh;background:var(--bg);color:var(--ink);font-family:var(--font);font-size:16px;line-height:1.4;
+  -webkit-font-smoothing:antialiased;-webkit-user-select:none;user-select:none;overflow-x:hidden}
+/* durum çubuğu (Dynamic Island) altına kayan içeriği örten bant */
+body::before{content:"";position:fixed;inset:0 0 auto;height:var(--safe-t);background:rgba(11,12,15,.92);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);z-index:19;pointer-events:none}
 button{font:inherit;color:inherit;border:0;background:none;cursor:pointer;padding:0}
 button:focus-visible,input:focus-visible{outline:2px solid var(--lime);outline-offset:2px}
 input{font:inherit;color:var(--ink);-webkit-user-select:text;user-select:text}
 .num{font-variant-numeric:tabular-nums}
 
-main{height:100%;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;
-  padding:calc(var(--safe-t) + 14px) max(16px,var(--safe-r)) calc(var(--safe-b) + 100px) max(16px,var(--safe-l))}
+main{display:block;padding:calc(var(--safe-t) + 12px) max(16px,var(--safe-r)) calc(var(--tabbar) + 20px) max(16px,var(--safe-l))}
 .view{display:none;flex-direction:column;gap:18px;max-width:640px;margin:0 auto}
 .view.on{display:flex}
 
@@ -205,11 +208,13 @@ h2{margin:0;font-size:1.15rem;font-weight:700;letter-spacing:-.01em}
 .fctl .btn{min-width:120px;padding:15px 20px;border-radius:18px;font-size:1rem}
 
 /* Sekme çubuğu + kayan gösterge */
-nav{position:fixed;left:0;right:0;bottom:0;z-index:20;padding:8px max(12px,var(--safe-r)) calc(var(--safe-b) + 8px) max(12px,var(--safe-l));
-  background:linear-gradient(to top,var(--bg) 55%,transparent)}
-.tabs{position:relative;max-width:520px;margin:0 auto;display:grid;grid-template-columns:repeat(5,1fr);background:rgba(29,32,39,.82);-webkit-backdrop-filter:blur(20px) saturate(1.4);backdrop-filter:blur(20px) saturate(1.4);
-  border:1px solid var(--line);border-radius:26px;padding:6px}
-.tabs .knob{position:absolute;top:6px;bottom:6px;left:6px;width:calc((100% - 12px)/5);border-radius:20px;background:var(--lime);transition:transform .6s var(--spring);will-change:transform}
+/* iOS tarzı alt çubuk: ekranın en altına yapışık, ana ekran çizgisinin arkasına kadar uzanır */
+nav{position:fixed;left:0;right:0;bottom:0;z-index:20;height:var(--tabbar);
+  padding:6px max(10px,var(--safe-r)) max(var(--safe-b),10px) max(10px,var(--safe-l));
+  background:rgba(17,19,23,.86);-webkit-backdrop-filter:blur(22px) saturate(1.5);backdrop-filter:blur(22px) saturate(1.5);
+  border-top:.5px solid var(--line)}
+.tabs{position:relative;max-width:520px;height:56px;margin:0 auto;display:grid;grid-template-columns:repeat(5,1fr);padding:0}
+.tabs .knob{position:absolute;top:2px;bottom:2px;left:4px;width:calc(100%/5 - 8px);border-radius:18px;background:var(--lime);transition:transform .6s var(--spring);will-change:transform}
 .tabs button{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:7px 2px;border-radius:20px;color:var(--muted);font-size:.66rem;font-weight:700;transition:color .25s}
 .tabs button svg{width:22px;height:22px;transition:transform .55s var(--spring)}
 .tabs button.on{color:var(--ink-on)}
@@ -240,7 +245,7 @@ nav{position:fixed;left:0;right:0;bottom:0;z-index:20;padding:8px max(12px,var(-
 .settings{display:flex;flex-direction:column;gap:8px}
 .settings .btn{text-align:left}
 .note{font-size:.78rem;color:var(--muted)}
-.toast{position:fixed;left:50%;bottom:calc(var(--safe-b) + 100px);transform:translate(-50%,30px) scale(.9);opacity:0;z-index:40;background:var(--ink);color:var(--ink-on);
+.toast{position:fixed;left:50%;bottom:calc(var(--tabbar) + 14px);transform:translate(-50%,30px) scale(.9);opacity:0;z-index:40;background:var(--ink);color:var(--ink-on);
   font-weight:700;font-size:.88rem;padding:10px 16px;border-radius:99px;transition:transform .55s var(--spring),opacity .25s;pointer-events:none;white-space:nowrap}
 .toast.on{opacity:1;transform:translate(-50%,0) scale(1)}
 #fx{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:35}
@@ -709,7 +714,7 @@ function show(v,animate=true){
   view=v;stopReplay();
   document.querySelectorAll(".view").forEach(s=>s.classList.toggle("on",s.id==="v-"+v));
   [...$("tabs").querySelectorAll("button")].forEach(b=>b.classList.toggle("on",b.dataset.v===v));
-  moveTabKnob();$("main").scrollTop=0;
+  moveTabKnob();window.scrollTo(0,0);
   if(v==="stats")requestAnimationFrame(()=>moveKnob($("range")));
   RENDER[v](true);
   if(animate)anim($("v-"+v),[{transform:`translateX(${dir*40}px)`,opacity:0},{transform:"none",opacity:1}],{duration:550,easing:SOFT});

@@ -1,5 +1,5 @@
 // Çetele çevrimdışı önbelleği. Uygulamayı güncellediğinde VERSION'ı artır.
-const VERSION = "cetele-v2";
+const VERSION = "cetele-v3";
 const FILES = ["./", "index.html", "manifest.webmanifest", "icons/icon-192.png", "icons/icon-512.png", "icons/apple-touch-icon.png"];
 
 self.addEventListener("install", e => {
