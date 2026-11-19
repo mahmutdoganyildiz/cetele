@@ -23,7 +23,7 @@
   --r:24px;
   --safe-t:env(safe-area-inset-top,0px); --safe-b:env(safe-area-inset-bottom,0px);
   --safe-l:env(safe-area-inset-left,0px); --safe-r:env(safe-area-inset-right,0px);
-  --tabbar:calc(62px + max(var(--safe-b),10px)); /* iPhone 16: 62 + 34 = 96px, ekranın en altına kadar */
+  --tabbar:calc(50px + max(var(--safe-b),8px)); /* iOS sekme çubuğu: 50pt + ana ekran çizgisi (iPhone 16: 50 + 34 = 84) */
   /* yay eğrileri */
   --spring:cubic-bezier(.34,1.56,.64,1);
   --spring-soft:cubic-bezier(.22,1.2,.36,1);
@@ -42,13 +42,13 @@ html{background:var(--bg);overscroll-behavior-y:none;-webkit-text-size-adjust:10
 body{margin:0;min-height:100vh;min-height:100lvh;background:var(--bg);color:var(--ink);font-family:var(--font);font-size:16px;line-height:1.4;
   -webkit-font-smoothing:antialiased;-webkit-user-select:none;user-select:none;overflow-x:hidden}
 /* durum çubuğu (Dynamic Island) altına kayan içeriği örten bant */
-body::before{content:"";position:fixed;inset:0 0 auto;height:var(--safe-t);background:rgba(11,12,15,.92);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);z-index:19;pointer-events:none}
+body::before{content:"";position:fixed;inset:0 0 auto;height:var(--safe-t);background:var(--bg);z-index:19;pointer-events:none}
 button{font:inherit;color:inherit;border:0;background:none;cursor:pointer;padding:0}
 button:focus-visible,input:focus-visible{outline:2px solid var(--lime);outline-offset:2px}
 input{font:inherit;color:var(--ink);-webkit-user-select:text;user-select:text}
 .num{font-variant-numeric:tabular-nums}
 
-main{display:block;padding:calc(var(--safe-t) + 12px) max(16px,var(--safe-r)) calc(var(--tabbar) + 20px) max(16px,var(--safe-l))}
+main{display:block;padding:calc(var(--safe-t) + 8px) max(16px,var(--safe-r)) calc(var(--tabbar) + 20px) max(16px,var(--safe-l))}
 .view{display:none;flex-direction:column;gap:18px;max-width:640px;margin:0 auto}
 .view.on{display:flex}
 
@@ -145,7 +145,7 @@ h2{margin:0;font-size:1.15rem;font-weight:700;letter-spacing:-.01em}
 .wd button{position:relative;width:100%;max-width:38px;aspect-ratio:1;border-radius:50%;background:var(--card2);overflow:hidden;transition:transform .55s var(--spring)}
 .wd button::after{content:"";position:absolute;inset:0;border-radius:50%;background:var(--c);transform:scale(0);transition:transform .5s var(--spring)}
 .wd button.on::after{transform:scale(1)}
-.wd button.today{box-shadow:0 0 0 2px var(--bg),0 0 0 3.5px var(--dim)}
+.wd:has(button.today){color:var(--lime);font-weight:800}
 .wd button:active{transform:scale(.82);transition:transform .1s}
 
 /* Yıl duvarı */
@@ -210,15 +210,17 @@ h2{margin:0;font-size:1.15rem;font-weight:700;letter-spacing:-.01em}
 /* Sekme çubuğu + kayan gösterge */
 /* iOS tarzı alt çubuk: ekranın en altına yapışık, ana ekran çizgisinin arkasına kadar uzanır */
 nav{position:fixed;left:0;right:0;bottom:0;z-index:20;height:var(--tabbar);
-  padding:6px max(10px,var(--safe-r)) max(var(--safe-b),10px) max(10px,var(--safe-l));
-  background:rgba(17,19,23,.86);-webkit-backdrop-filter:blur(22px) saturate(1.5);backdrop-filter:blur(22px) saturate(1.5);
-  border-top:.5px solid var(--line)}
-.tabs{position:relative;max-width:520px;height:56px;margin:0 auto;display:grid;grid-template-columns:repeat(5,1fr);padding:0}
-.tabs .knob{position:absolute;top:2px;bottom:2px;left:4px;width:calc(100%/5 - 8px);border-radius:18px;background:var(--lime);transition:transform .6s var(--spring);will-change:transform}
-.tabs button{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:7px 2px;border-radius:20px;color:var(--muted);font-size:.66rem;font-weight:700;transition:color .25s}
-.tabs button svg{width:22px;height:22px;transition:transform .55s var(--spring)}
+  padding:0 max(6px,var(--safe-r)) max(var(--safe-b),8px) max(6px,var(--safe-l));
+  background:rgba(17,19,23,.96);-webkit-backdrop-filter:blur(20px) saturate(1.4);backdrop-filter:blur(20px) saturate(1.4);
+  border-top:.5px solid rgba(255,255,255,.08)}
+.tabs{position:relative;max-width:520px;height:50px;margin:0 auto;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));padding:0}
+/* gösterge tam bir sekme genişliğinde; yeşil hap içeride. Böylece her sekmede tam ortalanır */
+.tabs .knob{position:absolute;top:4px;bottom:4px;left:0;width:20%;transition:transform .6s var(--spring);will-change:transform}
+.tabs .knob::before{content:"";position:absolute;inset:0 7px;border-radius:14px;background:var(--lime)}
+.tabs button{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:0;min-width:0;color:var(--muted);font-size:.625rem;font-weight:700;letter-spacing:.01em;transition:color .25s}
+.tabs button svg{width:23px;height:23px;flex:none;transition:transform .55s var(--spring)}
 .tabs button.on{color:var(--ink-on)}
-.tabs button.on svg{transform:translateY(-1px) scale(1.08)}
+.tabs button.on svg{transform:scale(1.06)}
 .tabs button:active svg{transform:scale(.8);transition-duration:.1s}
 
 /* Alt sayfa */
