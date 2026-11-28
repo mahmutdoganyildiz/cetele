@@ -24,17 +24,13 @@
   --safe-t:env(safe-area-inset-top,0px); --safe-b:env(safe-area-inset-bottom,0px);
   --safe-l:env(safe-area-inset-left,0px); --safe-r:env(safe-area-inset-right,0px);
   --tabbar:calc(50px + max(var(--safe-b),8px)); /* iOS sekme çubuğu: 50pt + ana ekran çizgisi (iPhone 16: 50 + 34 = 84) */
-  /* yay eğrileri */
-  --spring:cubic-bezier(.34,1.56,.64,1);
-  --spring-soft:cubic-bezier(.22,1.2,.36,1);
-  --ease-out:cubic-bezier(.16,1,.3,1);
+  /* hareket token'ları: tek eğri, üç süre, döngü eğrisi; yaylı eğri yalnızca başarı anında */
+  --md-ease:cubic-bezier(0.22,1,0.36,1);
+  --md-ease-spring:cubic-bezier(0.34,1.36,0.64,1);
+  --md-ease-loop:cubic-bezier(0.4,0,0.6,1);
+  --md-fast:150ms; --md-base:280ms; --md-slow:450ms; --md-stagger:60ms;
+  --md-wave:1100ms; --md-wave-slow:1700ms; --md-breathe:4000ms; /* sonsuz döngü süreleri */
   color-scheme:dark;
-}
-@supports (transition-timing-function:linear(0,1)){
-  :root{
-    --spring:linear(0,.009,.035 2.1%,.141,.281 6.7%,.723 12.9%,.938 16.7%,1.017,1.077,1.121,1.149 24.3%,1.159,1.163,1.161,1.154 29.9%,1.129 32.8%,1.051 39.6%,1.017 43.1%,.991,.977 51%,.974 53.8%,.975 57.1%,.997 69.8%,1.003 76.9%,1);
-    --spring-soft:linear(0,.006,.025 2.8%,.101 6.1%,.539 18.9%,.721 25.3%,.849 31.5%,.937 38.1%,.968 41.8%,.991 45.7%,1.006 50.1%,1.015 55%,1.017 63.9%,1.001 85.9%,1);
-  }
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 /* Sayfa belgenin kendisiyle kayar: iPhone ana ekran uygulamasında %100 yükseklik kısa kalıp altta boşluk bırakıyordu */
@@ -53,13 +49,13 @@ main{display:block;padding:calc(var(--safe-t) + 8px) max(16px,var(--safe-r)) cal
 .view.on{display:flex}
 
 /* basılma geri bildirimi: hızlı içe, yaylı dışa */
-.press{transition:transform .55s var(--spring)}
-.press:active{transform:scale(.94);transition:transform .12s ease-out}
+.press{transition:transform var(--md-fast) var(--md-ease)}
+.press:active{transform:scale(.94);transition:transform var(--md-fast) var(--md-ease)}
 
 /* kayan rakamlar */
 .odo{display:inline-flex;align-items:baseline;white-space:pre}
 .odo .dg{display:inline-block;height:1em;line-height:1em;overflow:hidden;vertical-align:baseline;position:relative}
-.odo .col{display:flex;flex-direction:column;transition:transform 1s var(--spring-soft);will-change:transform}
+.odo .col{display:flex;flex-direction:column;transition:transform var(--md-slow) var(--md-ease);will-change:transform}
 .odo .col span{height:1em;line-height:1em;text-align:center}
 .odo .ch{display:inline-block;line-height:1em}
 
@@ -70,19 +66,19 @@ h2{margin:0;font-size:1.15rem;font-weight:700;letter-spacing:-.01em}
 .pill{display:inline-flex;align-items:center;gap:6px;background:var(--card2);border-radius:99px;padding:7px 12px;font-size:.82rem;font-weight:600;color:var(--muted)}
 .pill b{color:var(--lime);font-size:.95rem}
 .flame{display:inline-block;transform-origin:50% 90%}
-.flame.go{animation:flame .8s var(--spring)}
+.flame.go{animation:flame var(--md-base) var(--md-ease)}
 @keyframes flame{0%{transform:scale(1)}30%{transform:scale(1.6) rotate(-12deg)}60%{transform:scale(.9) rotate(8deg)}100%{transform:none}}
 
 /* Özet kartı */
 .summary{display:grid;grid-template-columns:136px 1fr;gap:16px;align-items:center;background:var(--card);border-radius:var(--r);padding:16px}
 .ring{position:relative;width:136px;height:136px}
 .ring svg{width:100%;height:100%;overflow:visible}
-.ring .seg{transition:stroke-dashoffset .9s var(--spring-soft),opacity .3s}
+.ring .seg{transition:stroke-dashoffset var(--md-slow) var(--md-ease),opacity var(--md-fast) var(--md-ease)}
 .ring .mid{position:absolute;inset:0;display:grid;place-content:center;text-align:center}
 .ring .mid b{font-size:2rem;font-weight:800;line-height:1;display:flex;align-items:baseline;justify-content:center}
 .ring .mid b small{font-size:.55em;color:var(--muted);font-weight:700;margin-left:1px}
 .ring .mid > span{font-size:.72rem;color:var(--muted);margin-top:4px}
-.ring.glow svg{animation:glow 1.2s ease-out}
+.ring.glow svg{animation:glow var(--md-slow) var(--md-ease)}
 @keyframes glow{30%{filter:drop-shadow(0 0 14px rgba(200,245,60,.55))}}
 .counters{display:grid;gap:10px;min-width:0}
 .counter{display:flex;justify-content:space-between;align-items:baseline;gap:8px;border-bottom:1px solid var(--line);padding-bottom:8px}
@@ -90,7 +86,7 @@ h2{margin:0;font-size:1.15rem;font-weight:700;letter-spacing:-.01em}
 .counter > span{font-size:.82rem;color:var(--muted)}
 .counter b{font-size:1.35rem;font-weight:800}
 .counter.hot b{color:var(--lime)}
-.bump{animation:bump .7s var(--spring)}
+.bump{animation:bump var(--md-slow) var(--md-ease)}
 @keyframes bump{30%{transform:scale(1.4)}}
 
 /* Kutular — sıvı dolum */
@@ -98,33 +94,33 @@ h2{margin:0;font-size:1.15rem;font-weight:700;letter-spacing:-.01em}
 @media (min-width:560px){.tiles{grid-template-columns:repeat(3,minmax(0,1fr))}}
 .tile{position:relative;overflow:hidden;isolation:isolate;border-radius:var(--r);background:var(--card);min-height:168px;
   padding:14px;display:flex;flex-direction:column;justify-content:space-between;text-align:left;
-  transition:transform .55s var(--spring),color .35s ease .15s;will-change:transform}
-.tile:active{transform:scale(.95);transition:transform .12s ease-out,color .35s}
-.liquid{position:absolute;inset:0;z-index:-1;pointer-events:none;transform:translateY(calc(100% + 20px));transition:transform .6s cubic-bezier(.5,0,.75,0)}
+  transition:transform var(--md-base) var(--md-ease),color var(--md-fast) var(--md-ease) calc(var(--md-stagger)*2);will-change:transform}
+.tile:active{transform:scale(.95);transition:transform var(--md-fast) var(--md-ease),color var(--md-fast) var(--md-ease)}
+.liquid{position:absolute;inset:0;z-index:-1;pointer-events:none;transform:translateY(calc(100% + 20px));transition:transform var(--md-base) var(--md-ease)}
 .liquid .body{position:absolute;inset:0;background:var(--c)}
-.liquid .wavewrap{position:absolute;left:0;right:0;bottom:calc(100% - 1px);height:16px;overflow:hidden;transform-origin:bottom;transition:transform .5s ease .9s}
-.liquid .wave{position:absolute;left:0;top:0;width:200%;height:100%;fill:var(--c);animation:wave 1.1s linear infinite}
-.liquid .wave.b{opacity:.45;animation-duration:1.7s;animation-direction:reverse}
+.liquid .wavewrap{position:absolute;left:0;right:0;bottom:calc(100% - 1px);height:16px;overflow:hidden;transform-origin:bottom;transition:transform var(--md-base) var(--md-ease) var(--md-base)}
+.liquid .wave{position:absolute;left:0;top:0;width:200%;height:100%;fill:var(--c);animation:wave var(--md-wave) linear infinite}
+.liquid .wave.b{opacity:.45;animation-duration:var(--md-wave-slow);animation-direction:reverse}
 @keyframes wave{to{transform:translateX(-50%)}}
 .tile.done{color:var(--ink-on)}
-.tile.done .liquid{transform:translateY(0);transition:transform 1.05s var(--spring-soft)}
+.tile.done .liquid{transform:translateY(0);transition:transform var(--md-base) var(--md-ease)}
 .tile.done .wavewrap{transform:scaleY(0)}
-.tile .icon{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;font-size:1.45rem;background:color-mix(in srgb,var(--c) 22%,transparent);transition:background .4s ease .2s}
+.tile .icon{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;font-size:1.45rem;background:color-mix(in srgb,var(--c) 22%,transparent);transition:background var(--md-fast) var(--md-ease) calc(var(--md-stagger)*3)}
 .tile.done .icon{background:rgba(0,0,0,.12)}
 .tile .ticks{display:flex;gap:3px;margin-top:8px}
-.tile .ticks i{flex:1;height:4px;border-radius:2px;background:color-mix(in srgb,var(--c) 30%,var(--card2));transition:background .4s}
+.tile .ticks i{flex:1;height:4px;border-radius:2px;background:color-mix(in srgb,var(--c) 30%,var(--card2));transition:background var(--md-fast) var(--md-ease)}
 .tile .ticks i.on{background:var(--c)}
 .tile.done .ticks i{background:rgba(0,0,0,.14)}
 .tile.done .ticks i.on{background:rgba(0,0,0,.55)}
 .tile .foot{display:flex;justify-content:space-between;align-items:flex-end;gap:8px}
 .tile .name{font-weight:700;font-size:1.02rem;line-height:1.2;word-break:break-word}
 .tile .sub{font-size:.76rem;opacity:.7;margin-top:3px;font-weight:600}
-.tile .check{flex:none;width:32px;height:32px;border-radius:50%;border:2px solid var(--dim);display:grid;place-items:center;transition:border-color .3s,background .3s,transform .6s var(--spring)}
+.tile .check{flex:none;width:32px;height:32px;border-radius:50%;border:2px solid var(--dim);display:grid;place-items:center;transition:border-color var(--md-fast) var(--md-ease),background var(--md-fast) var(--md-ease),transform var(--md-base) var(--md-ease-spring)}
 .tile.done .check{border-color:transparent;background:var(--ink-on);color:var(--c);transform:rotate(360deg)}
-.tile .check svg{width:16px;height:16px;stroke-dasharray:24;stroke-dashoffset:24;transition:stroke-dashoffset .4s ease .35s}
+.tile .check svg{width:16px;height:16px;stroke-dasharray:24;stroke-dashoffset:24;transition:stroke-dashoffset var(--md-base) var(--md-ease) calc(var(--md-stagger)*6)}
 .tile.done .check svg{stroke-dashoffset:0}
 .tile.add{background:transparent;border:2px dashed var(--line);color:var(--muted);align-items:center;justify-content:center;gap:6px;font-weight:700}
-.tile.add .plus{font-size:2rem;line-height:1;transition:transform .6s var(--spring)}
+.tile.add .plus{font-size:2rem;line-height:1;transition:transform var(--md-base) var(--md-ease)}
 .tile.add:active .plus{transform:rotate(90deg)}
 
 .banner{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:14px;display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap}
@@ -142,11 +138,11 @@ h2{margin:0;font-size:1.15rem;font-weight:700;letter-spacing:-.01em}
 .row .edit{width:36px;height:36px;border-radius:12px;background:var(--card2);color:var(--muted);font-size:1.1rem}
 .week{grid-column:1/-1;display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
 .wd{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:.66rem;color:var(--muted);font-weight:600}
-.wd button{position:relative;width:100%;max-width:38px;aspect-ratio:1;border-radius:50%;background:var(--card2);overflow:hidden;transition:transform .55s var(--spring)}
-.wd button::after{content:"";position:absolute;inset:0;border-radius:50%;background:var(--c);transform:scale(0);transition:transform .5s var(--spring)}
+.wd button{position:relative;width:100%;max-width:38px;aspect-ratio:1;border-radius:50%;background:var(--card2);overflow:hidden;transition:transform var(--md-base) var(--md-ease)}
+.wd button::after{content:"";position:absolute;inset:0;border-radius:50%;background:var(--c);transform:scale(0);transition:transform var(--md-base) var(--md-ease)}
 .wd button.on::after{transform:scale(1)}
 .wd:has(button.today){color:var(--lime);font-weight:800}
-.wd button:active{transform:scale(.82);transition:transform .1s}
+.wd button:active{transform:scale(.82);transition:transform var(--md-fast) var(--md-ease)}
 
 /* Yıl duvarı */
 .yearbar{display:flex;align-items:center;justify-content:space-between;gap:10px}
@@ -155,15 +151,15 @@ h2{margin:0;font-size:1.15rem;font-weight:700;letter-spacing:-.01em}
 .yearnav b{font-size:1.6rem;font-weight:800;min-width:72px;text-align:center;display:inline-block}
 .chips{position:relative;display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;margin:0 calc(-1 * max(16px,var(--safe-l)));padding:2px max(16px,var(--safe-l))}
 .chips::-webkit-scrollbar{display:none}
-.chip{flex:none;background:var(--card2);border-radius:99px;padding:8px 14px;font-size:.84rem;font-weight:700;color:var(--muted);display:flex;gap:6px;align-items:center;transition:background .3s,color .3s,transform .55s var(--spring)}
-.chip:active{transform:scale(.92);transition:transform .1s}
+.chip{flex:none;background:var(--card2);border-radius:99px;padding:8px 14px;font-size:.84rem;font-weight:700;color:var(--muted);display:flex;gap:6px;align-items:center;transition:background var(--md-fast) var(--md-ease),color var(--md-fast) var(--md-ease),transform var(--md-base) var(--md-ease)}
+.chip:active{transform:scale(.92);transition:transform var(--md-fast) var(--md-ease)}
 .chip i{width:9px;height:9px;border-radius:50%;background:var(--c,var(--lime))}
 .chip.on{background:var(--ink);color:var(--ink-on)}
 .wall{background:var(--card);border-radius:var(--r);padding:14px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px 12px}
 @media (min-width:560px){.wall{grid-template-columns:repeat(4,minmax(0,1fr))}}
 .month h3{margin:0 0 6px;font-size:.74rem;color:var(--muted);font-weight:700}
 .mgrid{display:grid;grid-template-columns:repeat(7,1fr);gap:2.5px}
-.cell{aspect-ratio:1;border-radius:3px;background:var(--card2);transition:background-color .35s ease}
+.cell{aspect-ratio:1;border-radius:3px;background:var(--card2);transition:background-color var(--md-fast) var(--md-ease)}
 .cell.pad{visibility:hidden}
 .cell.fut{opacity:.35}
 .cell.pf{box-shadow:inset 0 0 0 1.5px #fff8}
@@ -188,7 +184,7 @@ h2{margin:0;font-size:1.15rem;font-weight:700;letter-spacing:-.01em}
 .hrow:last-child{border:0}
 .hrow .t{font-size:.86rem;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-bottom:5px}
 .track{height:8px;border-radius:99px;background:var(--card2);overflow:hidden}
-.track i{display:block;height:100%;width:100%;border-radius:99px;background:var(--c);transform-origin:left;transform:scaleX(0);transition:transform 1.1s var(--spring-soft)}
+.track i{display:block;height:100%;width:100%;border-radius:99px;background:var(--c);transform-origin:left;transform:scaleX(0);transition:transform var(--md-slow) var(--md-ease)}
 .hrow .p{font-size:.86rem;font-weight:800;text-align:right;display:flex;justify-content:flex-end}
 
 /* Odak */
@@ -198,11 +194,11 @@ h2{margin:0;font-size:1.15rem;font-weight:700;letter-spacing:-.01em}
 .bigring .mid{position:absolute;inset:0;display:grid;place-content:center;text-align:center}
 .bigring .mid b{font-size:clamp(2.6rem,14vw,3.6rem);font-weight:800;letter-spacing:-.02em;display:flex;justify-content:center}
 .bigring .mid > span{color:var(--muted);font-weight:600;font-size:.9rem}
-.bigring.running svg{animation:breathe 4s ease-in-out infinite}
+.bigring.running svg{animation:breathe var(--md-breathe) var(--md-ease-loop) infinite}
 @keyframes breathe{50%{filter:drop-shadow(0 0 18px rgba(200,245,60,.35))}}
 .seg3{position:relative;display:grid;grid-auto-flow:column;grid-auto-columns:1fr;background:var(--card);border-radius:16px;padding:4px;width:100%;max-width:360px}
-.seg3 .knob{position:absolute;top:4px;bottom:4px;left:4px;border-radius:12px;background:var(--card2);transition:transform .55s var(--spring);will-change:transform}
-.seg3 button{position:relative;z-index:1;padding:10px 6px;border-radius:12px;font-weight:700;font-size:.88rem;color:var(--muted);transition:color .3s}
+.seg3 .knob{position:absolute;top:4px;bottom:4px;left:4px;border-radius:12px;background:var(--card2);transition:transform var(--md-base) var(--md-ease);will-change:transform}
+.seg3 button{position:relative;z-index:1;padding:10px 6px;border-radius:12px;font-weight:700;font-size:.88rem;color:var(--muted);transition:color var(--md-fast) var(--md-ease)}
 .seg3 button.on{color:var(--ink)}
 .fctl{display:flex;gap:12px}
 .fctl .btn{min-width:120px;padding:15px 20px;border-radius:18px;font-size:1rem}
@@ -215,19 +211,19 @@ nav{position:fixed;left:0;right:0;bottom:0;z-index:20;height:var(--tabbar);
   border-top:.5px solid rgba(255,255,255,.08)}
 .tabs{position:relative;max-width:520px;height:50px;margin:0 auto;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));padding:0}
 /* gösterge tam bir sekme genişliğinde; yeşil hap içeride. Böylece her sekmede tam ortalanır */
-.tabs .knob{position:absolute;top:4px;bottom:4px;left:0;width:20%;transition:transform .6s var(--spring);will-change:transform}
+.tabs .knob{position:absolute;top:4px;bottom:4px;left:0;width:20%;transition:transform var(--md-base) var(--md-ease);will-change:transform}
 .tabs .knob::before{content:"";position:absolute;inset:0 7px;border-radius:14px;background:var(--lime)}
-.tabs button{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:0;min-width:0;color:var(--muted);font-size:.625rem;font-weight:700;letter-spacing:.01em;transition:color .25s}
-.tabs button svg{width:23px;height:23px;flex:none;transition:transform .55s var(--spring)}
+.tabs button{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:0;min-width:0;color:var(--muted);font-size:.625rem;font-weight:700;letter-spacing:.01em;transition:color var(--md-fast) var(--md-ease)}
+.tabs button svg{width:23px;height:23px;flex:none;transition:transform var(--md-base) var(--md-ease)}
 .tabs button.on{color:var(--ink-on)}
 .tabs button.on svg{transform:scale(1.06)}
-.tabs button:active svg{transform:scale(.8);transition-duration:.1s}
+.tabs button:active svg{transform:scale(.8);transition-duration:var(--md-fast)}
 
 /* Alt sayfa */
-.scrim{position:fixed;inset:0;z-index:30;background:rgba(0,0,0,.55);opacity:0;pointer-events:none;transition:opacity .35s}
+.scrim{position:fixed;inset:0;z-index:30;background:rgba(0,0,0,.55);opacity:0;pointer-events:none;transition:opacity var(--md-fast) var(--md-ease)}
 .scrim.on{opacity:1;pointer-events:auto}
 .sheet{position:fixed;left:0;right:0;bottom:0;z-index:31;background:var(--card);border-radius:28px 28px 0 0;max-width:640px;margin:0 auto;
-  padding:10px max(18px,var(--safe-r)) calc(var(--safe-b) + 18px) max(18px,var(--safe-l));transform:translateY(105%);transition:transform .6s var(--spring-soft);
+  padding:10px max(18px,var(--safe-r)) calc(var(--safe-b) + 18px) max(18px,var(--safe-l));transform:translateY(105%);transition:transform var(--md-base) var(--md-ease);
   max-height:88vh;overflow-y:auto;will-change:transform}
 .sheet.on{transform:translateY(0)}
 .sheet.drag{transition:none}
@@ -238,9 +234,9 @@ nav{position:fixed;left:0;right:0;bottom:0;z-index:20;height:var(--tabbar);
 .field input,.field textarea{background:var(--card2);border:1px solid var(--line);border-radius:14px;padding:13px 14px;font-size:16px;width:100%;color:var(--ink);font-family:inherit}
 .field textarea{min-height:110px;font-family:var(--mono);font-size:12px;resize:vertical;-webkit-user-select:text;user-select:text}
 .emojis,.colors{display:flex;flex-wrap:wrap;gap:8px}
-.emojis button{width:42px;height:42px;border-radius:12px;background:var(--card2);font-size:1.25rem;transition:transform .5s var(--spring),box-shadow .2s}
+.emojis button{width:42px;height:42px;border-radius:12px;background:var(--card2);font-size:1.25rem;transition:transform var(--md-base) var(--md-ease),box-shadow var(--md-fast) var(--md-ease)}
 .emojis button.on{box-shadow:0 0 0 2px var(--lime);transform:scale(1.08)}
-.colors button{width:38px;height:38px;border-radius:50%;background:var(--c);transition:transform .5s var(--spring),box-shadow .2s}
+.colors button{width:38px;height:38px;border-radius:50%;background:var(--c);transition:transform var(--md-base) var(--md-ease),box-shadow var(--md-fast) var(--md-ease)}
 .colors button.on{box-shadow:0 0 0 3px var(--card),0 0 0 5px var(--c);transform:scale(1.08)}
 .sheet .actions{display:flex;gap:10px;margin-top:6px}
 .sheet .actions .btn{flex:1;padding:14px}
@@ -248,10 +244,13 @@ nav{position:fixed;left:0;right:0;bottom:0;z-index:20;height:var(--tabbar);
 .settings .btn{text-align:left}
 .note{font-size:.78rem;color:var(--muted)}
 .toast{position:fixed;left:50%;bottom:calc(var(--tabbar) + 14px);transform:translate(-50%,30px) scale(.9);opacity:0;z-index:40;background:var(--ink);color:var(--ink-on);
-  font-weight:700;font-size:.88rem;padding:10px 16px;border-radius:99px;transition:transform .55s var(--spring),opacity .25s;pointer-events:none;white-space:nowrap}
+  font-weight:700;font-size:.88rem;padding:10px 16px;border-radius:99px;transition:transform var(--md-base) var(--md-ease),opacity var(--md-fast) var(--md-ease);pointer-events:none;white-space:nowrap}
 .toast.on{opacity:1;transform:translate(-50%,0) scale(1)}
 #fx{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:35}
-@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition-duration:.01s!important}}
+@media (prefers-reduced-motion:reduce){
+  :root{--md-fast:0ms;--md-base:0ms;--md-slow:0ms;--md-stagger:0ms;--md-wave:0ms;--md-wave-slow:0ms;--md-breathe:0ms}
+  *,*::before,*::after{animation:none!important;transition-duration:.01ms!important;transition-delay:0ms!important}
+}
 </style>
 </head>
 <body>
@@ -340,7 +339,7 @@ nav{position:fixed;left:0;right:0;bottom:0;z-index:20;height:var(--tabbar);
       <div class="seg3" id="fModes"><span class="knob"></span><button class="on" data-m="25">Odak 25</button><button data-m="50">Derin 50</button><button data-m="5">Mola 5</button></div>
       <div class="bigring" id="bigring">
         <svg viewBox="0 0 200 200"><circle cx="100" cy="100" r="88" fill="none" stroke="#1D2027" stroke-width="14"/>
-          <circle id="fArc" cx="100" cy="100" r="88" fill="none" stroke="#C8F53C" stroke-width="14" stroke-linecap="round" stroke-dasharray="552.9" stroke-dashoffset="0" style="transition:stroke-dashoffset .6s var(--spring-soft)"/></svg>
+          <circle id="fArc" cx="100" cy="100" r="88" fill="none" stroke="#C8F53C" stroke-width="14" stroke-linecap="round" stroke-dasharray="552.9" stroke-dashoffset="0" style="transition:stroke-dashoffset var(--md-base) var(--md-ease)"/></svg>
         <div class="mid"><b class="num" id="fClock"></b><span id="fState">Hazır</span></div>
       </div>
       <div class="fctl"><button class="btn lime press" id="fStart">Başlat</button><button class="btn press" id="fReset">Sıfırla</button></div>
@@ -384,10 +383,10 @@ document.addEventListener("touchstart",()=>{},{passive:true}); // iOS'ta :active
 
 /* ---------- hareket araçları ---------- */
 const CSSV=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
-const SPRING=CSSV("--spring")||"cubic-bezier(.34,1.56,.64,1)";
-const SOFT=CSSV("--spring-soft")||"cubic-bezier(.22,1.2,.36,1)";
-function anim(el,kf,opt){if(RM||!el.animate)return;try{return el.animate(kf,opt)}catch(e){try{return el.animate(kf,{...opt,easing:"cubic-bezier(.22,1.2,.36,1)"})}catch(_){}}}
-function stagger(nodes,kf,{step=45,dur=650,easing=SOFT,delay=0}={}){
+const tok=n=>parseFloat(CSSV(n))||0; /* süreler (ms): tek kaynak :root token'ları */
+const MD={ease:CSSV("--md-ease"),fast:tok("--md-fast"),base:tok("--md-base"),slow:tok("--md-slow"),stagger:tok("--md-stagger")};
+function anim(el,kf,opt){if(RM||!el.animate)return;try{return el.animate(kf,opt)}catch(e){try{return el.animate(kf,{...opt,easing:MD.ease})}catch(_){}}}
+function stagger(nodes,kf,{step=MD.stagger,dur=MD.slow,easing=MD.ease,delay=0}={}){
   [...nodes].forEach((n,i)=>anim(n,kf,{duration:dur,delay:delay+i*step,easing,fill:"backwards"}));
 }
 const RISE=[{transform:"translateY(22px) scale(.96)",opacity:0},{transform:"none",opacity:1}];
@@ -406,7 +405,7 @@ function odo(el,val,suffix=""){
     [...el.querySelectorAll(".col")].forEach(c=>c.style.transition="");
   }
   const digits=[...s].filter(c=>/\d/.test(c));
-  el.querySelectorAll(".col").forEach((c,i)=>{c.style.transitionDelay=(digits.length-1-i)*60+"ms";c.style.transform=`translateY(-${digits[i]}em)`});
+  el.querySelectorAll(".col").forEach((c,i)=>{c.style.transitionDelay=(digits.length-1-i)*MD.stagger+"ms";c.style.transform=`translateY(-${digits[i]}em)`});
   el.dataset.v=s;
 }
 function sig(s){return s.replace(/\d/g,"0")}
@@ -481,13 +480,13 @@ function buildSegRing(el,n){
 function updateSegRing(el,segs){
   const built=+el.dataset.n!==segs.length;if(built)buildSegRing(el,segs.length);
   const cs=el.querySelectorAll(".seg");
-  const apply=()=>segs.forEach((s,i)=>{const c=cs[i];c.style.transitionDelay=built?i*90+"ms":"0ms";c.style.strokeDashoffset=s.on?0:c.dataset.len;c.style.opacity=s.on?1:0});
+  const apply=()=>segs.forEach((s,i)=>{const c=cs[i];c.style.transitionDelay=built?i*MD.stagger+"ms":"0ms";c.style.strokeDashoffset=s.on?0:c.dataset.len;c.style.opacity=s.on?1:0});
   segs.forEach((s,i)=>cs[i].setAttribute("stroke",s.color));
   if(built)requestAnimationFrame(()=>requestAnimationFrame(apply));else apply();
   odo(el.querySelector(".a"),segs.filter(s=>s.on).length);odo(el.querySelector(".t"),segs.length);
 }
 function pctRing(el,pct,label){
-  if(!el.querySelector(".pc")){el.innerHTML=`<svg viewBox="0 0 136 136" style="transform:rotate(-90deg)"><circle cx="68" cy="68" r="${R}" fill="none" stroke="#252932" stroke-width="12"/><circle class="pc" cx="68" cy="68" r="${R}" fill="none" stroke="#C8F53C" stroke-width="12" stroke-linecap="round" stroke-dasharray="${C}" stroke-dashoffset="${C}" style="transition:stroke-dashoffset 1.2s var(--spring-soft)"/></svg><div class="mid"><b class="num"></b><span>${label}</span></div>`}
+  if(!el.querySelector(".pc")){el.innerHTML=`<svg viewBox="0 0 136 136" style="transform:rotate(-90deg)"><circle cx="68" cy="68" r="${R}" fill="none" stroke="#252932" stroke-width="12"/><circle class="pc" cx="68" cy="68" r="${R}" fill="none" stroke="#C8F53C" stroke-width="12" stroke-linecap="round" stroke-dasharray="${C}" stroke-dashoffset="${C}" style="transition:stroke-dashoffset var(--md-slow) var(--md-ease)"/></svg><div class="mid"><b class="num"></b><span>${label}</span></div>`}
   const c=el.querySelector(".pc");requestAnimationFrame(()=>requestAnimationFrame(()=>c.style.strokeDashoffset=C*(1-pct/100)));
   odo(el.querySelector("b"),Math.round(pct),"%");
 }
@@ -514,7 +513,7 @@ function renderToday(enter){
   });
   const add=document.createElement("button");add.className="tile add";add.innerHTML=`<span class="plus">+</span><span>Alışkanlık ekle</span>`;add.onclick=()=>editSheet();box.appendChild(add);
   renderTodaySummary();
-  if(enter){stagger(document.querySelectorAll("#v-today [data-st]"),RISE,{step:70});stagger(box.children,[{transform:"translateY(30px) scale(.9)",opacity:0},{transform:"none",opacity:1}],{step:55,delay:120,dur:800})}
+  if(enter){stagger(document.querySelectorAll("#v-today [data-st]"),RISE,{step:MD.stagger});stagger(box.children,[{transform:"translateY(30px) scale(.9)",opacity:0},{transform:"none",opacity:1}],{step:MD.stagger,delay:MD.stagger*2,dur:MD.slow})}
 }
 function renderTodaySummary(){
   const ids=idset(),d=doneOn(TK,ids);
@@ -534,13 +533,13 @@ function toggleToday(id,tile){
   tile.classList.toggle("done",on);tile.setAttribute("aria-pressed",on);
   const st=streak(id);tile.querySelector(".sub").textContent=st?st+" gün seri":"Bugün başla";
   tile.querySelector(".ticks").innerHTML=last7(id);
-  if(on){const[x,y]=centerOf(tile.querySelector(".check"));setTimeout(()=>burst(x,y,[h.color,"#fff",h.color],16,5),380)}
+  if(on){const[x,y]=centerOf(tile.querySelector(".check"));setTimeout(()=>burst(x,y,[h.color,"#fff",h.color],16,5),MD.stagger*6)}
   renderTodaySummary();
   if(!was&&isPerfect(TK)){
     setTimeout(()=>{const ring=$("todayRing");const[x,y]=centerOf(ring);
       ring.classList.remove("glow");void ring.offsetWidth;ring.classList.add("glow");
       burst(x,y,S.habits.map(h=>h.color).concat("#C8F53C","#fff"),90,9,"conf");
-      bump($("cPerfect"));toast("Mükemmel gün! 🎉")},650);
+      bump($("cPerfect"));toast("Mükemmel gün! 🎉")},MD.slow);
   }
 }
 $("clearSample").onclick=()=>{S.log={};S.focus={};S.sample=false;save();renderToday(true);toast("Geçmiş temizlendi")};
@@ -562,15 +561,15 @@ function renderHabits(enter){
       row.querySelector(".st").textContent=`🔥 ${streak(h.id)} gün · en iyi ${bestStreak(h.id)}`;});
     L.appendChild(row);
   });
-  if(enter){stagger(L.children,RISE,{step:55});
-    L.querySelectorAll(".row").forEach((r,ri)=>stagger(r.querySelectorAll(".wd button.on"),[{transform:"scale(0)"},{transform:"scale(1)"}],{step:35,delay:200+ri*55,dur:600,easing:SPRING}));
-    stagger(document.querySelectorAll("#v-habits [data-st]"),RISE,{delay:S.habits.length*55})}
+  if(enter){stagger(L.children,RISE,{step:MD.stagger});
+    L.querySelectorAll(".row").forEach((r,ri)=>stagger(r.querySelectorAll(".wd button.on"),[{transform:"scale(0)"},{transform:"scale(1)"}],{step:MD.stagger/2,delay:MD.stagger*3+ri*MD.stagger,dur:MD.slow,easing:MD.ease}));
+    stagger(document.querySelectorAll("#v-habits [data-st]"),RISE,{delay:S.habits.length*MD.stagger})}
 }
 $("addHabit2").onclick=()=>editSheet();
 
 /* ---------- alt sayfa (sürükleyerek kapanır) ---------- */
 function openSheet(html){$("sheetBody").innerHTML=html;$("scrim").classList.add("on");$("sheet").classList.add("on");
-  stagger($("sheetBody").children,[{transform:"translateY(16px)",opacity:0},{transform:"none",opacity:1}],{step:50,delay:120,dur:550})}
+  stagger($("sheetBody").children,[{transform:"translateY(16px)",opacity:0},{transform:"none",opacity:1}],{step:MD.stagger,delay:MD.stagger*2,dur:MD.slow})}
 function closeSheet(){$("scrim").classList.remove("on");$("sheet").classList.remove("on");$("sheet").style.transform=""}
 $("scrim").onclick=closeSheet;
 (()=>{const sh=$("sheet");let y0=null,dy=0,t0=0;
@@ -588,7 +587,7 @@ function editSheet(h){
     <div class="actions">${isNew?"":`<button class="btn danger press" id="hDel">Sil</button>`}<button class="btn lime press" id="hSave">${isNew?"Ekle":"Kaydet"}</button></div>`);
   $("hEmo").onclick=e=>{const b=e.target.closest("button");if(!b)return;cur.emoji=b.dataset.e;[...$("hEmo").children].forEach(x=>x.classList.toggle("on",x===b))};
   $("hCol").onclick=e=>{const b=e.target.closest("button");if(!b)return;cur.color=b.dataset.c;[...$("hCol").children].forEach(x=>x.classList.toggle("on",x===b));const[x,y]=centerOf(b);burst(x,y,[cur.color],8,3)};
-  $("hSave").onclick=()=>{const n=$("hName").value.trim();if(!n){$("hName").focus();anim($("hName"),[{transform:"translateX(0)"},{transform:"translateX(-8px)"},{transform:"translateX(8px)"},{transform:"translateX(-4px)"},{transform:"none"}],{duration:380});return}
+  $("hSave").onclick=()=>{const n=$("hName").value.trim();if(!n){$("hName").focus();anim($("hName"),[{transform:"translateX(0)"},{transform:"translateX(-8px)"},{transform:"translateX(8px)"},{transform:"translateX(-4px)"},{transform:"none"}],{duration:MD.base,easing:MD.ease});return}
     if(isNew)S.habits.push({id:"h"+Date.now().toString(36),name:n,emoji:cur.emoji,color:cur.color});else Object.assign(h,{name:n,emoji:cur.emoji,color:cur.color});
     save();closeSheet();rerender();toast(isNew?"Eklendi":"Kaydedildi")};
   if(!isNew){let armed=false;$("hDel").onclick=()=>{if(!armed){armed=true;$("hDel").textContent="Emin misin?";return}
@@ -635,7 +634,7 @@ function yearStats(upto){const ids=idset();let p=0,t=0,a=0;for(const c of cells)
   const n=yFilter==="all"?doneOn(k,ids).length:((S.log[k]||[]).includes(yFilter)?1:0);t+=n;if(n)a++;if(isPerfect(k,ids))p++}return{p,t,a}}
 function setYearStats(s){odo($("yPerfect"),s.p);odo($("yTotal"),s.t);odo($("yActive"),s.a)}
 function paintWall(wave){const ids=idset();cells.forEach(c=>paintCell(c,ids));setYearStats(yearStats());
-  if(wave)cells.forEach((c,i)=>anim(c,[{transform:"scale(.2)",opacity:.2},{transform:"scale(1)",opacity:1}],{duration:550,delay:i*2.2,easing:SPRING,fill:"backwards"}))}
+  if(wave)cells.forEach((c,i)=>anim(c,[{transform:"scale(.2)",opacity:.2},{transform:"scale(1)",opacity:1}],{duration:MD.base,delay:i*MD.stagger/30,easing:MD.ease,fill:"backwards"}))}
 let replayRAF=null;
 function stopReplay(){if(replayRAF){cancelAnimationFrame(replayRAF);replayRAF=null}$("replay").textContent="▶ Oynat"}
 $("replay").onclick=()=>{
@@ -649,16 +648,16 @@ $("replay").onclick=()=>{
   const t0=performance.now();let shown=0,lastStat=0;
   const step=t=>{const p=Math.min(1,(t-t0)/dur),e=p<.5?2*p*p:1-Math.pow(-2*p+2,2)/2;const target=Math.min(end,Math.ceil(e*end));
     for(;shown<target;shown++){const c=cells[shown];paintCell(c,ids);
-      if(c.style.backgroundColor)anim(c,[{transform:"scale(1.9)",borderRadius:"50%"},{transform:"scale(1)",borderRadius:"3px"}],{duration:520,easing:SPRING})}
+      if(c.style.backgroundColor)anim(c,[{transform:"scale(1.9)",borderRadius:"50%"},{transform:"scale(1)",borderRadius:"3px"}],{duration:MD.base,easing:MD.ease})}
     if(t-lastStat>90||shown>=end){lastStat=t;setYearStats(yearStats(cells[Math.max(0,shown-1)].dataset.k))}
     if(shown<end)replayRAF=requestAnimationFrame(step);else{replayRAF=null;$("replay").textContent="▶ Oynat";
       const[x,y]=centerOf($("replay"));burst(x,y,["#C8F53C","#fff"],30,6)}};
   replayRAF=requestAnimationFrame(step);
 };
-function changeYear(d){stopReplay();year+=d;buildWall();paintWall(true);anim($("wall"),[{transform:`translateX(${d*30}px)`,opacity:0},{transform:"none",opacity:1}],{duration:500,easing:SOFT})}
+function changeYear(d){stopReplay();year+=d;buildWall();paintWall(true);anim($("wall"),[{transform:`translateX(${d*30}px)`,opacity:0},{transform:"none",opacity:1}],{duration:MD.base,easing:MD.ease})}
 $("yPrev").onclick=()=>changeYear(-1);
 $("yNext").onclick=()=>{if(year<today.getFullYear())changeYear(1)};
-function renderYear(enter){renderYearChips();buildWall();paintWall(enter);if(enter){stagger($("yearChips").children,[{transform:"translateX(24px)",opacity:0},{transform:"none",opacity:1}],{step:40});stagger(document.querySelectorAll(".ws"),RISE,{step:60})}}
+function renderYear(enter){renderYearChips();buildWall();paintWall(enter);if(enter){stagger($("yearChips").children,[{transform:"translateX(24px)",opacity:0},{transform:"none",opacity:1}],{step:MD.stagger});stagger(document.querySelectorAll(".ws"),RISE,{step:MD.stagger})}}
 
 /* ---------- İSTATİSTİK ---------- */
 let range=30;
@@ -674,7 +673,7 @@ function renderStats(enter){
   $("sBestDay").textContent=n?["Pzt","Sal","Çar","Per","Cum","Cmt","Paz"][bi]:"–";
   const B=$("bars");B.style.gap=range>30?"1.5px":"3px";
   B.innerHTML=days.map(x=>`<i class="${x.r<.5?"lo":""}" style="transform:scaleY(${Math.max(.03,x.r)})"></i>`).join("");
-  [...B.children].forEach((b,i)=>anim(b,[{transform:"scaleY(0)"},{transform:b.style.transform}],{duration:900,delay:i*(range>30?8:22),easing:SPRING,fill:"backwards"}));
+  [...B.children].forEach((b,i)=>anim(b,[{transform:"scaleY(0)"},{transform:b.style.transform}],{duration:MD.slow,delay:i*MD.stagger/(range>30?8:3),easing:MD.ease,fill:"backwards"}));
   const f=d=>d.toLocaleDateString("tr-TR",{day:"numeric",month:"short"});
   $("axis").innerHTML=`<span>${f(days[0].d)}</span><span>${f(days[Math.floor(days.length/2)].d)}</span><span>Bugün</span>`;
   const P=$("perHabit");
@@ -682,9 +681,9 @@ function renderStats(enter){
   if(!n){P.innerHTML=`<p class="note">Alışkanlık ekleyince burada görünür.</p>`}
   else{if(P.children.length!==rows.length||!P.querySelector(".hrow")){P.innerHTML=rows.map(({h})=>`<div class="hrow" style="--c:${h.color}"><span style="font-size:1.25rem;text-align:center">${esc(h.emoji||"•")}</span><div style="min-width:0"><div class="t">${esc(h.name)}</div><div class="track"><i></i></div></div><span class="p num"><b></b></span></div>`).join("")}
     const hr=[...P.querySelectorAll(".hrow")];
-    rows.forEach((r,i)=>{const bar=hr[i].querySelector(".track i");bar.style.transitionDelay=(enter?300:0)+i*60+"ms";
+    rows.forEach((r,i)=>{const bar=hr[i].querySelector(".track i");bar.style.transitionDelay=(enter?MD.base:0)+i*MD.stagger+"ms";
       requestAnimationFrame(()=>requestAnimationFrame(()=>bar.style.transform=`scaleX(${r.p/100})`));odo(hr[i].querySelector(".p b"),r.p,"%")});}
-  if(enter){stagger(document.querySelectorAll("#v-stats [data-st]"),RISE,{step:70})}
+  if(enter){stagger(document.querySelectorAll("#v-stats [data-st]"),RISE,{step:MD.stagger})}
 }
 
 /* ---------- ODAK ---------- */
@@ -709,7 +708,7 @@ try{const t=JSON.parse(localStorage.getItem(KEY+"-timer"));if(t&&t.end){fMin=t.m
 /* ---------- sekmeler: kayan gösterge + yönlü geçiş ---------- */
 const ORDER=["today","habits","year","stats","focus"];
 let view="today";
-const RENDER={today:renderToday,habits:renderHabits,year:renderYear,stats:renderStats,focus:()=>{fDraw();moveKnob($("fModes"));stagger(document.querySelectorAll("#v-focus .focus > *"),RISE,{step:70})}};
+const RENDER={today:renderToday,habits:renderHabits,year:renderYear,stats:renderStats,focus:()=>{fDraw();moveKnob($("fModes"));stagger(document.querySelectorAll("#v-focus .focus > *"),RISE,{step:MD.stagger})}};
 function moveTabKnob(){const i=ORDER.indexOf(view);$("tabKnob").style.transform=`translateX(${i*100}%)`}
 function show(v,animate=true){
   const dir=Math.sign(ORDER.indexOf(v)-ORDER.indexOf(view))||1;
@@ -719,7 +718,7 @@ function show(v,animate=true){
   moveTabKnob();window.scrollTo(0,0);
   if(v==="stats")requestAnimationFrame(()=>moveKnob($("range")));
   RENDER[v](true);
-  if(animate)anim($("v-"+v),[{transform:`translateX(${dir*40}px)`,opacity:0},{transform:"none",opacity:1}],{duration:550,easing:SOFT});
+  if(animate)anim($("v-"+v),[{transform:`translateX(${dir*40}px)`,opacity:0},{transform:"none",opacity:1}],{duration:MD.slow,easing:MD.ease});
   try{sessionStorage.setItem("cetele-view",v)}catch(e){}
 }
 $("tabs").onclick=e=>{const b=e.target.closest("button");if(b&&b.dataset.v!==view){buzz();show(b.dataset.v)}};
